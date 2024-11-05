@@ -6,8 +6,6 @@ import { getProducts } from "@/app/_data-access/product/get-products";
 const ProductsPage = async () => {
   const products = await getProducts();
 
-  console.log(products);
-
   return (
     <div className="w-full px-8">
       <header className="flex w-full items-center justify-between space-y-8 py-8">
@@ -26,7 +24,7 @@ const ProductsPage = async () => {
         </div>
       </header>
       <main className="rounded-xl bg-white px-8 py-2">
-        <DataTableProducts data={products} />
+        <DataTableProducts data={JSON.parse(JSON.stringify(products))} />
       </main>
     </div>
   );
