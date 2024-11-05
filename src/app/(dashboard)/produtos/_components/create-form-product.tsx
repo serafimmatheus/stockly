@@ -25,12 +25,12 @@ import {
 } from "@/app/_components/ui/form";
 import { Input } from "@/app/_components/ui/input";
 import { NumericFormat } from "react-number-format";
+import { createProduct } from "@/app/_actions/products/create-products";
+import { useState } from "react";
 import {
-  createProduct,
   FormCreateProducts,
   formSchemaCreateProducts,
-} from "@/app/_actions/products/create-products";
-import { useState } from "react";
+} from "@/app/_actions/products/products.DTO";
 
 const CreateFormProducts = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
