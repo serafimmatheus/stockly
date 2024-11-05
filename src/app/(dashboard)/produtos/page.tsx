@@ -1,7 +1,7 @@
-import { Button } from "@/app/_components/ui/button";
-import { Plus } from "lucide-react";
 import { DataTableProducts } from "./_components/tableProducts";
 import { getProducts } from "@/app/_data-access/product/get-products";
+
+import CreateFormProducts from "./_components/create-form-product";
 
 const ProductsPage = async () => {
   const products = await getProducts();
@@ -16,12 +16,7 @@ const ProductsPage = async () => {
           </h2>
         </div>
 
-        <div>
-          <Button className="gap-2 bg-[#00A180] text-white hover:bg-[#00A180] hover:opacity-90">
-            <Plus size={18} />
-            Novo produto
-          </Button>
-        </div>
+        <CreateFormProducts />
       </header>
       <main className="rounded-xl bg-white px-8 py-2">
         <DataTableProducts data={JSON.parse(JSON.stringify(products))} />
