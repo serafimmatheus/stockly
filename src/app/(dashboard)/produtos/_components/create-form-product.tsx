@@ -11,9 +11,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/app/_components/ui/dialog";
-import { Plus } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
@@ -25,44 +25,46 @@ import {
 } from "@/app/_components/ui/form";
 import { Input } from "@/app/_components/ui/input";
 import { NumericFormat } from "react-number-format";
-
-const formSchemaCreateProducts = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(2, {
-      message: "Nome do produto deve conter no mínimo 2 caracteres",
-    })
-    .max(50, {
-      message: "Nome do produto deve conter no máximo 50 caracteres",
-    }),
-  price: z.number().min(0.01, {
-    message: "Valor unitário deve ser maior que 0.01",
-  }),
-  stock: z.coerce.number().positive().int().min(0, {
-    message: "Estoque deve ser maior que 0",
-  }),
-});
-
-type FormCreateProducts = z.infer<typeof formSchemaCreateProducts>;
+import {
+  createProduct,
+  FormCreateProducts,
+  formSchemaCreateProducts,
+} from "@/app/_actions/products/create-products";
+import { useState } from "react";
 
 const CreateFormProducts = () => {
+  const [dialogOpen, setDialogOpen] = useState(false);
+
   const form = useForm<FormCreateProducts>({
     shouldUnregister: true,
     resolver: zodResolver(formSchemaCreateProducts),
     defaultValues: {
       name: "",
+      slug: "",
       price: 0,
       stock: 1,
     },
   });
 
-  const onSubmitData = (data: FormCreateProducts) => {
-    console.log(data);
+  const onSubmitData = async (data: FormCreateProducts) => {
+    await createProduct(data);
+
+    form.reset({
+      name: "",
+      slug: "",
+      price: 1,
+      stock: 1,
+    });
+
+    setDialogOpen(false);
+    try {
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
-    <Dialog>
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
         <Button className="gap-2 bg-[#00A180] text-white hover:bg-[#00A180] hover:opacity-90">
           <Plus size={18} />
@@ -88,6 +90,21 @@ const CreateFormProducts = () => {
                   <FormLabel>Nome do produto</FormLabel>
                   <FormControl>
                     <Input placeholder="Nome do produto" {...field} />
+                  </FormControl>
+
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="slug"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Slug do produto</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Slug do produto" {...field} />
                   </FormControl>
 
                   <FormMessage />
@@ -140,11 +157,24 @@ const CreateFormProducts = () => {
 
             <DialogFooter>
               <DialogClose asChild>
-                <Button variant="secondary" type="reset">
+                <Button
+                  disabled={form.formState.isSubmitting}
+                  variant="secondary"
+                  type="reset"
+                >
                   Cancelar
                 </Button>
               </DialogClose>
-              <Button type="submit">Criar produto</Button>
+              <Button
+                className="gap-1.5"
+                disabled={form.formState.isSubmitting}
+                type="submit"
+              >
+                {form.formState.isSubmitting && (
+                  <Loader2 size={18} className="animate-spin" />
+                )}
+                Criar produto
+              </Button>
             </DialogFooter>
           </form>
         </Form>
