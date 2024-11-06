@@ -10,9 +10,9 @@ export const getProducts = unstable_cache(
     const products = await db.product.findMany();
     return products;
   },
-  ["get-products"],
+  ["getProducts"],
   {
-    revalidate: 5,
+    tags: ["get-products"],
   },
 );
 

@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/app/_lib/prisma-client";
-import { revalidatePath } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { FormCreateProducts, formSchemaCreateProducts } from "./products.DTO";
 
 export const createProduct = async (data: FormCreateProducts) => {
@@ -18,5 +18,5 @@ export const createProduct = async (data: FormCreateProducts) => {
     },
   });
 
-  revalidatePath("/produtos");
+  revalidateTag("get-products");
 };
