@@ -1,11 +1,11 @@
 "use server";
 import { db } from "@/app/_lib/prisma-client";
-import { Product } from "@prisma/client";
 import { revalidateTag } from "next/cache";
+import { FormCreateProducts } from "./products.DTO";
 
 interface UpdateProductIPros {
   id: string;
-  data: Partial<Product>;
+  data: FormCreateProducts;
 }
 
 export const updateProduct = async ({ id, data }: UpdateProductIPros) => {

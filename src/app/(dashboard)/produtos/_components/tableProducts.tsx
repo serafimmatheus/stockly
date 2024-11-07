@@ -129,10 +129,12 @@ export const columns: ColumnDef<Product>[] = [
               </DropdownMenuItem>
               <DropdownMenuSeparator />
 
-              <DropdownMenuItem className="cursor-pointer">
-                <Edit size={18} />
-                Editar
-              </DropdownMenuItem>
+              <AlertDialogTrigger asChild>
+                <DropdownMenuItem className="cursor-pointer">
+                  <Edit size={18} />
+                  Editar
+                </DropdownMenuItem>
+              </AlertDialogTrigger>
 
               <AlertDialogTrigger asChild>
                 <DropdownMenuItem className="cursor-pointer bg-red-500 text-white focus:bg-red-600 focus:text-white">
