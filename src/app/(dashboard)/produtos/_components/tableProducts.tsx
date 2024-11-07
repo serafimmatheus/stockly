@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useState } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -46,7 +47,10 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/app/_components/ui/alert-dialog";
+
+import { Dialog, DialogTrigger } from "@/app/_components/ui/dialog";
 import { toast } from "sonner";
+import UpdateFormProducts from "./edit-form-products";
 
 const onDeleteProduct = async (id: string) => {
   try {
@@ -108,58 +112,75 @@ export const columns: ColumnDef<Product>[] = [
     id: "actions",
     header: "Ações",
     cell: ({ row }) => {
-      const { id, slug } = row.original;
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const [editDialogOpen, setEditDialogOpen] = useState(false);
+      const { id, slug, name, price, stock } = row.original;
+
+      const newData = {
+        id,
+        slug,
+        name,
+        price,
+        stock,
+      };
 
       return (
         <AlertDialog>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Ações</DropdownMenuLabel>
-              <DropdownMenuItem
-                className="cursor-pointer"
-                onClick={() => navigator.clipboard.writeText(slug)}
-              >
-                Copy payment ID
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-
-              <AlertDialogTrigger asChild>
-                <DropdownMenuItem className="cursor-pointer">
-                  <Edit size={18} />
-                  Editar
+          <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => navigator.clipboard.writeText(slug)}
+                >
+                  Copy payment ID
                 </DropdownMenuItem>
-              </AlertDialogTrigger>
+                <DropdownMenuSeparator />
 
-              <AlertDialogTrigger asChild>
-                <DropdownMenuItem className="cursor-pointer bg-red-500 text-white focus:bg-red-600 focus:text-white">
-                  <Trash size={18} />
-                  Deletar
-                </DropdownMenuItem>
-              </AlertDialogTrigger>
-            </DropdownMenuContent>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>
-                  Deletar produto: {row.getValue("name")}
-                </AlertDialogTitle>
-                <AlertDialogDescription>
-                  Você tem certeza que deseja deletar este produto?
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Não</AlertDialogCancel>
-                <AlertDialogAction onClick={() => onDeleteProduct(id)}>
-                  Sim
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </DropdownMenu>
+                <DialogTrigger asChild>
+                  <DropdownMenuItem className="cursor-pointer">
+                    <Edit size={18} />
+                    Editar
+                  </DropdownMenuItem>
+                </DialogTrigger>
+
+                <AlertDialogTrigger asChild>
+                  <DropdownMenuItem className="cursor-pointer bg-red-500 text-white focus:bg-red-600 focus:text-white">
+                    <Trash size={18} />
+                    Deletar
+                  </DropdownMenuItem>
+                </AlertDialogTrigger>
+              </DropdownMenuContent>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    Deletar produto: {row.getValue("name")}
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Você tem certeza que deseja deletar este produto?
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Não</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => onDeleteProduct(id)}>
+                    Sim
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+
+              <UpdateFormProducts
+                dataProduct={JSON.parse(JSON.stringify(newData))}
+                onClose={() => setEditDialogOpen(false)}
+              />
+            </DropdownMenu>
+          </Dialog>
         </AlertDialog>
       );
     },

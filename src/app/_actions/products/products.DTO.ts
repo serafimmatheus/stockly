@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const formSchemaCreateProducts = z.object({
+  id: z.string().uuid().optional(),
   name: z
     .string()
     .trim()

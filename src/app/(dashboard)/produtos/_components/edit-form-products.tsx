@@ -30,23 +30,31 @@ import {
 import { toast } from "sonner";
 import { updateProduct } from "@/app/_actions/products/update-product";
 
-const UpdateFormProducts = (productId: string) => {
-  console.log(productId);
+interface UpdateFormProductsIProps {
+  dataProduct: FormCreateProducts;
+  onClose: () => void;
+}
+
+const UpdateFormProducts = ({
+  dataProduct,
+  onClose,
+}: UpdateFormProductsIProps) => {
+  console.log(dataProduct);
 
   const form = useForm<FormCreateProducts>({
     shouldUnregister: true,
     resolver: zodResolver(formSchemaCreateProducts),
     defaultValues: {
-      name: "",
-      slug: "",
-      price: 0,
-      stock: 1,
+      name: dataProduct?.name || "",
+      slug: dataProduct?.slug || "",
+      price: dataProduct?.price || 1,
+      stock: dataProduct?.stock || 1,
     },
   });
 
   const onSubmitData = async (data: FormCreateProducts) => {
     try {
-      await updateProduct({ id: "1", data });
+      await updateProduct({ id: dataProduct?.id ?? "", data });
 
       form.reset({
         name: "",
@@ -54,6 +62,8 @@ const UpdateFormProducts = (productId: string) => {
         price: 1,
         stock: 1,
       });
+
+      onClose();
 
       toast.success("Produto atualizado com sucesso");
     } catch (error) {
@@ -64,7 +74,7 @@ const UpdateFormProducts = (productId: string) => {
   return (
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>Cadastrar produto</DialogTitle>
+        <DialogTitle>Editar produto</DialogTitle>
         <DialogDescription>Insira as informações abaixo</DialogDescription>
       </DialogHeader>
 
@@ -77,7 +87,11 @@ const UpdateFormProducts = (productId: string) => {
               <FormItem>
                 <FormLabel>Nome do produto</FormLabel>
                 <FormControl>
-                  <Input placeholder="Nome do produto" {...field} />
+                  <Input
+                    defaultValue={dataProduct?.name}
+                    placeholder="Nome do produto"
+                    {...field}
+                  />
                 </FormControl>
 
                 <FormMessage />
@@ -92,7 +106,11 @@ const UpdateFormProducts = (productId: string) => {
               <FormItem>
                 <FormLabel>Slug do produto</FormLabel>
                 <FormControl>
-                  <Input placeholder="Slug do produto" {...field} />
+                  <Input
+                    defaultValue={dataProduct?.slug}
+                    placeholder="Slug do produto"
+                    {...field}
+                  />
                 </FormControl>
 
                 <FormMessage />
@@ -108,6 +126,7 @@ const UpdateFormProducts = (productId: string) => {
                 <FormLabel>Valor unitário</FormLabel>
                 <FormControl>
                   <NumericFormat
+                    defaultValue={dataProduct?.price}
                     thousandSeparator="."
                     decimalSeparator=","
                     fixedDecimalScale
@@ -135,7 +154,12 @@ const UpdateFormProducts = (productId: string) => {
               <FormItem>
                 <FormLabel>Estoque</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="Estoque" {...field} />
+                  <Input
+                    defaultValue={dataProduct?.stock}
+                    type="number"
+                    placeholder="Estoque"
+                    {...field}
+                  />
                 </FormControl>
 
                 <FormMessage />
@@ -161,7 +185,7 @@ const UpdateFormProducts = (productId: string) => {
               {form.formState.isSubmitting && (
                 <Loader2 size={18} className="animate-spin" />
               )}
-              Criar produto
+              Salvar
             </Button>
           </DialogFooter>
         </form>
