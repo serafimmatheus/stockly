@@ -31,6 +31,7 @@ import {
   FormCreateProducts,
   formSchemaCreateProducts,
 } from "@/app/_actions/products/products.DTO";
+import { toast } from "sonner";
 
 const CreateFormProducts = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -47,19 +48,21 @@ const CreateFormProducts = () => {
   });
 
   const onSubmitData = async (data: FormCreateProducts) => {
-    await createProduct(data);
-
-    form.reset({
-      name: "",
-      slug: "",
-      price: 1,
-      stock: 1,
-    });
-
-    setDialogOpen(false);
     try {
+      await createProduct(data);
+
+      form.reset({
+        name: "",
+        slug: "",
+        price: 1,
+        stock: 1,
+      });
+
+      setDialogOpen(false);
+
+      toast.success("Produto cadastrado com sucesso");
     } catch (error) {
-      console.error(error);
+      toast.error("Erro ao cadastrar produto");
     }
   };
 

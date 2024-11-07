@@ -16,7 +16,7 @@ export const getProducts = unstable_cache(
   },
 );
 
-// independentemente de onde a função getProducts seja chamada, ela sempre retornará os mesmos dados uma unica vez.
+// independentemente de onde a função getProducts seja chamada, uma, duas, tres e quantas forem, ela sempre será chamada uma unica vez.
 export const getProductsComCache = cache(async (): Promise<Product[]> => {
   const products = await db.product.findMany();
   return products;

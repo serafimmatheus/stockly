@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "../globals.css";
 import { Sidebar } from "../_components/Sidebar/page";
 import { Inter } from "next/font/google";
+import { Toaster } from "../_components/ui/sonner";
 
 const inter = Inter({
   display: "auto",
@@ -21,6 +22,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={`${inter.className} antialiased`}>
+        <Toaster richColors />
         <main className="flex h-full gap-8">
           <Sidebar />
           {children}
