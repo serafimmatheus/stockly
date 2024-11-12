@@ -87,7 +87,10 @@ export function UpsertSheetContent({ dataProducts }: UpsertSheetContentIProps) {
           if (order.id === product.id) {
             return {
               ...order,
-              quantity: order.quantity + data.quantity,
+              quantity:
+                data.quantity + order.quantity <= product.stock
+                  ? data.quantity + order.quantity
+                  : order.quantity,
             };
           }
 

@@ -50,7 +50,7 @@ export function TableSalesOrder({ products, onDelete }: TableSalesOrderIProps) {
           <TableHead>Nome</TableHead>
           <TableHead>Preço</TableHead>
           <TableHead>Quantidade</TableHead>
-          <TableHead>Total</TableHead>
+          <TableHead className="text-right">Total</TableHead>
           <TableHead className="text-right">Ações</TableHead>
         </TableRow>
       </TableHeader>
@@ -105,13 +105,14 @@ export function TableSalesOrder({ products, onDelete }: TableSalesOrderIProps) {
       </TableBody>
       <TableFooter>
         <TableRow>
-          <TableCell colSpan={4}>Total</TableCell>
+          <TableCell colSpan={3}>Total</TableCell>
           <TableCell className="text-right">
             {new Intl.NumberFormat("pt-BR", {
               style: "currency",
               currency: "BRL",
             }).format(total)}
           </TableCell>
+          <TableCell></TableCell>
         </TableRow>
       </TableFooter>
     </Table>
