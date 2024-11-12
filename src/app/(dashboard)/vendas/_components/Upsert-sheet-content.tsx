@@ -116,8 +116,12 @@ export function UpsertSheetContent({ dataProducts }: UpsertSheetContentIProps) {
     });
   }
 
+  const handleDelete = (productId: string) => {
+    setOrderSales((prev) => prev.filter((order) => order.id !== productId));
+  };
+
   return (
-    <SheetContent>
+    <SheetContent className="!w-full md:!max-w-2xl">
       <SheetHeader>
         <SheetTitle>Nova venda</SheetTitle>
         <SheetDescription>
@@ -130,80 +134,82 @@ export function UpsertSheetContent({ dataProducts }: UpsertSheetContentIProps) {
           onSubmit={form.handleSubmit(onSubmit)}
           className="w-full space-y-6 py-6"
         >
-          <FormField
-            control={form.control}
-            name="productId"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Produtos</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        className={cn(
-                          "w-full justify-between",
-                          !field.value && "text-muted-foreground",
-                        )}
-                      >
-                        {field.value
-                          ? dataProducts.find(
-                              (product) => product.id === field.value,
-                            )?.name
-                          : "Selecione o produto"}
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-full p-0">
-                    <Command>
-                      <CommandInput placeholder="pesquise o produto..." />
-                      <CommandList>
-                        <CommandEmpty>Nenhum produto encontrado</CommandEmpty>
-                        <CommandGroup>
-                          {dataProducts?.map((language) => (
-                            <CommandItem
-                              value={language.id}
-                              key={language.id}
-                              onSelect={() => {
-                                form.setValue("productId", language.id);
-                              }}
-                            >
-                              {language.name}
-                              <Check
-                                className={cn(
-                                  "ml-auto",
-                                  language.name === field.value
-                                    ? "opacity-100"
-                                    : "opacity-0",
-                                )}
-                              />
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
+          <div className="flex flex-col gap-3 md:flex-row">
+            <FormField
+              control={form.control}
+              name="productId"
+              render={({ field }) => (
+                <FormItem className="flex flex-1 flex-col">
+                  <FormLabel>Produtos</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn(
+                            "w-full justify-between",
+                            !field.value && "text-muted-foreground",
+                          )}
+                        >
+                          {field.value
+                            ? dataProducts.find(
+                                (product) => product.id === field.value,
+                              )?.name
+                            : "Selecione o produto"}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0">
+                      <Command>
+                        <CommandInput placeholder="pesquise o produto..." />
+                        <CommandList>
+                          <CommandEmpty>Nenhum produto encontrado</CommandEmpty>
+                          <CommandGroup>
+                            {dataProducts?.map((language) => (
+                              <CommandItem
+                                value={language.id}
+                                key={language.id}
+                                onSelect={() => {
+                                  form.setValue("productId", language.id);
+                                }}
+                              >
+                                {language.name}
+                                <Check
+                                  className={cn(
+                                    "ml-auto",
+                                    language.name === field.value
+                                      ? "opacity-100"
+                                      : "opacity-0",
+                                  )}
+                                />
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
 
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="quantity"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Quantidade</FormLabel>
-                <Input type="number" {...field} />
+            <FormField
+              control={form.control}
+              name="quantity"
+              render={({ field }) => (
+                <FormItem className="flex flex-col md:w-32">
+                  <FormLabel>Quantidade</FormLabel>
+                  <Input type="number" {...field} />
 
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
           <Button type="submit" className="w-full gap-2">
             <Plus size={18} />
             Adicionar produto à venda
@@ -211,7 +217,7 @@ export function UpsertSheetContent({ dataProducts }: UpsertSheetContentIProps) {
         </form>
       </Form>
 
-      <TableSalesOrder products={orderSales} />
+      <TableSalesOrder onDelete={handleDelete} products={orderSales} />
     </SheetContent>
   );
 }
