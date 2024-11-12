@@ -36,7 +36,6 @@ import { Product } from "@prisma/client";
 import { Check, ChevronsUpDown, Plus } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { z } from "zod";
 import { TableSalesOrder } from "./table-sales-order";
 
@@ -76,14 +75,25 @@ export function UpsertSheetContent({ dataProducts }: UpsertSheetContentIProps) {
       }
 
       if (product.stock < data.quantity) {
-        toast.error(
-          `Produto: ${data.productId}, Quantidade: ${data.quantity} excede o estoque!`,
-        );
+        form.setError("quantity", {
+          message: `Quantidade indisponível em estoque!`,
+        });
         return prev;
       }
 
       if (prev.some((order) => order.id === product.id)) {
         return prev.map((order) => {
+          if (data.quantity + order.quantity > product.stock) {
+            // toast.error(
+            //   `Produto: ${data.productId}, Quantidade: ${data.quantity} excede o estoque!`,
+            // );
+            form.setError("quantity", {
+              message: `Quantidade indisponível em estoque!`,
+            });
+
+            return order;
+          }
+
           if (order.id === product.id) {
             return {
               ...order,
@@ -109,9 +119,6 @@ export function UpsertSheetContent({ dataProducts }: UpsertSheetContentIProps) {
         },
       ];
     });
-    toast.success(
-      `Produto: ${data.productId}, Quantidade: ${data.quantity} Adicionado com sucesso!`,
-    );
 
     form.reset({
       productId: "",
@@ -207,12 +214,15 @@ export function UpsertSheetContent({ dataProducts }: UpsertSheetContentIProps) {
                 <FormItem className="flex flex-col md:w-32">
                   <FormLabel>Quantidade</FormLabel>
                   <Input type="number" {...field} />
-
-                  <FormMessage />
                 </FormItem>
               )}
             />
           </div>
+
+          {form.formState.errors.quantity && (
+            <FormMessage>{form.formState.errors.quantity.message}</FormMessage>
+          )}
+
           <Button type="submit" className="w-full gap-2">
             <Plus size={18} />
             Adicionar produto à venda
