@@ -11,7 +11,6 @@ import {
 } from "@/app/_components/ui/command";
 import {
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -34,10 +33,12 @@ import {
 import { cn } from "@/app/_lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Product } from "@prisma/client";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, Plus } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { TableSalesOrder } from "./table-sales-order";
 
 const formSchema = z.object({
   productId: z.string(),
@@ -50,15 +51,69 @@ interface UpsertSheetContentIProps {
   dataProducts: Product[];
 }
 
+interface OrderSales {
+  name: string;
+  id: string;
+  slug: string;
+  price: number;
+  quantity: number;
+}
+
 export function UpsertSheetContent({ dataProducts }: UpsertSheetContentIProps) {
+  const [orderSales, setOrderSales] = useState<OrderSales[]>([]);
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
   });
 
   function onSubmit(data: FormValues) {
+    setOrderSales((prev) => {
+      const product = dataProducts.find(
+        (product) => product.id === data.productId,
+      );
+
+      if (!product) {
+        return prev;
+      }
+
+      if (product.stock < data.quantity) {
+        toast.error(
+          `Produto: ${data.productId}, Quantidade: ${data.quantity} excede o estoque!`,
+        );
+        return prev;
+      }
+
+      if (prev.some((order) => order.id === product.id)) {
+        return prev.map((order) => {
+          if (order.id === product.id) {
+            return {
+              ...order,
+              quantity: order.quantity + data.quantity,
+            };
+          }
+
+          return order;
+        });
+      }
+
+      return [
+        ...prev,
+        {
+          name: product.name,
+          id: product.id,
+          slug: product.slug,
+          price: Number(product.price),
+          quantity: data.quantity,
+        },
+      ];
+    });
     toast.success(
-      `Venda criada com sucesso! Produto: ${data.productId}, Quantidade: ${data.quantity}`,
+      `Produto: ${data.productId}, Quantidade: ${data.quantity} Adicionado com sucesso!`,
     );
+
+    form.reset({
+      productId: "",
+      quantity: 0,
+    });
   }
 
   return (
@@ -149,9 +204,14 @@ export function UpsertSheetContent({ dataProducts }: UpsertSheetContentIProps) {
               </FormItem>
             )}
           />
-          <Button type="submit">Submit</Button>
+          <Button type="submit" className="w-full gap-2">
+            <Plus size={18} />
+            Adicionar produto à venda
+          </Button>
         </form>
       </Form>
+
+      <TableSalesOrder products={orderSales} />
     </SheetContent>
   );
 }
