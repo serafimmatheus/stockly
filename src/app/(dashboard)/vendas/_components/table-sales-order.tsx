@@ -65,7 +65,7 @@ export function TableSalesOrder({ products, onDelete }: TableSalesOrderIProps) {
               }).format(product.price)}
             </TableCell>
             <TableCell>{product.quantity}</TableCell>
-            <TableCell>
+            <TableCell className="text-right">
               {new Intl.NumberFormat("pt-BR", {
                 style: "currency",
                 currency: "BRL",
