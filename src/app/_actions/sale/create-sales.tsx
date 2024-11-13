@@ -30,6 +30,15 @@ const createSales = async (data: CreateSale) => {
       throw new Error("Product is out of stock");
     }
 
+    await db.saleProduct.create({
+      data: {
+        saleId: sale.id,
+        productId: product.id,
+        quantity: product.quantity,
+        unitPrice: productFromDb.price,
+      },
+    });
+
     await db.product.update({
       where: {
         id: product.id,
@@ -38,15 +47,6 @@ const createSales = async (data: CreateSale) => {
         stock: {
           decrement: product.quantity,
         },
-      },
-    });
-
-    await db.saleProduct.create({
-      data: {
-        saleId: sale.id,
-        productId: product.id,
-        quantity: product.quantity,
-        unitPrice: productFromDb.price,
       },
     });
   }
