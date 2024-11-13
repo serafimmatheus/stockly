@@ -27,17 +27,20 @@ import {
 import {
   SheetContent,
   SheetDescription,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
 } from "@/app/_components/ui/sheet";
 import { cn } from "@/app/_lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Product } from "@prisma/client";
-import { Check, ChevronsUpDown, Plus } from "lucide-react";
+import { Check, CheckCheck, ChevronsUpDown, Plus } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { TableSalesOrder } from "./table-sales-order";
+import { toast } from "sonner";
+import { createSales } from "@/app/_actions/sale/create-sales";
 
 const formSchema = z.object({
   productId: z.string(),
@@ -48,6 +51,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 interface UpsertSheetContentIProps {
   dataProducts: Product[];
+  onSubmitSuccess: () => void;
 }
 
 interface OrderSales {
@@ -58,7 +62,10 @@ interface OrderSales {
   quantity: number;
 }
 
-export function UpsertSheetContent({ dataProducts }: UpsertSheetContentIProps) {
+export function UpsertSheetContent({
+  dataProducts,
+  onSubmitSuccess,
+}: UpsertSheetContentIProps) {
   const [orderSales, setOrderSales] = useState<OrderSales[]>([]);
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -128,6 +135,24 @@ export function UpsertSheetContent({ dataProducts }: UpsertSheetContentIProps) {
 
   const handleDelete = (productId: string) => {
     setOrderSales((prev) => prev.filter((order) => order.id !== productId));
+  };
+
+  const handleSubmitSale = async () => {
+    try {
+      await createSales({
+        products: orderSales.map((order) => ({
+          id: order.id,
+          quantity: order.quantity,
+        })),
+      });
+
+      setOrderSales([]);
+      toast.success("Venda finalizada com sucesso!");
+      onSubmitSuccess();
+    } catch (error) {
+      console.error(error);
+      toast.error("Erro ao finalizar a venda!");
+    }
   };
 
   return (
@@ -231,6 +256,17 @@ export function UpsertSheetContent({ dataProducts }: UpsertSheetContentIProps) {
       </Form>
 
       <TableSalesOrder onDelete={handleDelete} products={orderSales} />
+
+      <SheetFooter className="pt-6">
+        <Button
+          disabled={orderSales.length === 0}
+          className="w-full gap-2"
+          onClick={handleSubmitSale}
+        >
+          <CheckCheck size={18} />
+          Finalizar venda
+        </Button>
+      </SheetFooter>
     </SheetContent>
   );
 }
